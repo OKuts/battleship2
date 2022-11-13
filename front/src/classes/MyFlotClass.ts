@@ -9,11 +9,20 @@ interface IShip {
   attack: number
 }
 
+export interface IFlot {
+   [key: string]: IShip
+}
+
+export interface IGame {
+  sea: ICell[],
+  flot: IFlot
+}
+
+
 export class MyFlotClass {
   sea: ICell[]
+  flot: IFlot
   #tempArr: number[]
-  flot: { [key: string]: IShip }
-
 
   constructor() {
     this.sea = new Array(100).fill({ship: null, attack: false})
@@ -21,6 +30,11 @@ export class MyFlotClass {
     this.flot = {}
     this.#initFlot()
     this.#setFlotToSea()
+
+  }
+
+  getGame(): IGame {
+    return {sea: this.sea, flot: this.flot}
   }
 
   #getRandomIndex(max: number) {
@@ -89,10 +103,10 @@ export class MyFlotClass {
         const num = this.#getRandomIndex(this.#tempArr.length)
         flag = this.#canToPlace(num, ships[i])
         n++
-      } while (!flag && n < 5000)
+      } while (!flag)
     }
-
-    console.log(this.flot)
+    this.#tempArr = []
+    // console.log(this.flot)
     // console.log(this.sea)
   }
 

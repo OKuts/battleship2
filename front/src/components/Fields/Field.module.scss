@@ -10,9 +10,12 @@
   td {
     width: 30px;
     position: relative;
+    text-align: center;
+    font-weight: bold;
 
     &.hover {
       background-color: gray;
+      opacity: 0.5;
     }
 
   }
