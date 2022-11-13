@@ -16,7 +16,7 @@ export class MyFlotClass {
 
 
   constructor() {
-    this.sea = new Array(100).fill(  {ship: null, attack: false})
+    this.sea = new Array(100).fill({ship: null, attack: false})
     this.#tempArr = [...new Array(100).fill(0).keys()]
     this.flot = {}
     this.#initFlot()
@@ -37,47 +37,63 @@ export class MyFlotClass {
     })
   }
 
+  #getShipCoordinates(num: number, direction: boolean, ship: number): number[] {
+    const startY = num > 9 ? Number(`${num}`[0]) : 0
+    const startX = num - startY * 10
+    const endY = direction ? startY : startY + ship - 1
+    const endX = direction ? startX + ship - 1 : startX
+    return [startY, startX, endY, endX]
+  }
+
+  #getAroundShip(startY: number, startX: number, endY: number, endX: number): number[] {
+    const maxY = endY === 9 ? 9 : endY + 1
+    const maxX = endX === 9 ? 9 : endX + 1
+    const minX = startX === 0 ? 0 : startX - 1
+    const minY = startY === 0 ? 0 : startY - 1
+    return [minY, minX, maxY, maxX]
+  }
+
   #canToPlace(num: number, ship: string) {
     const direction = !!this.#getRandomIndex(2)
     if (!this.#tempArr[num]) return false
-    const yx = num.toString().length === 1 ? `0${num}` : `${num}`
-    const [startY, startX] = yx
-    const endY = direction ? +startY : +startY + +ship[0] - 1
-    const endX = direction ? +startX + +ship[0] - 1 : +startX
+    const [startY, startX, endY, endX] = this.#getShipCoordinates(num, direction, +ship[0])
     if (endX > 9 || endY > 9) return false
-    const maxY = endY === 9 ? 9 : endY + 1
-    const maxX = endX === 9 ? 9 : endX + 1
+    const [minY, minX, maxY, maxX] = this.#getAroundShip(startY, startX, endY, endX)
     const tempSea = [...this.sea]
     const tempFilter: number[] = []
 
-    for (let i = +startY - 1; i <= maxY; i++) {
-      for (let j = +startX - 1; j <= maxX; j++) {
-        if (tempSea[i*10+j].ship) {
-          return false
-        } else {
-          (endY >= i && i >= +startY && endX >= j && j >= +startX)
-            ? tempSea[i*10+j] = { ship, attack: false}
-            : tempSea[i*10+j]= { ship: '0', attack: false}
-            tempFilter.push(i*10+j)
+    for (let i = minY; i <= maxY; i++) {
+      for (let j = minX; j <= maxX; j++) {
+        if (tempSea[i * 10 + j].ship) return false
+        if (endY >= i && i >= startY && endX >= j && j >= startX) {
+          tempSea[i * 10 + j] = {ship, attack: false}
+          tempFilter.push(i * 10 + j)
         }
       }
     }
+
     this.sea = [...tempSea]
     this.#tempArr = this.#tempArr.filter(el => !tempFilter.includes(el))
-    this.flot[ship].yx = yx
+    this.flot[ship].yx = num < 10 ? `0${num}` : `${num}`
     this.flot[ship].direction = direction
 
     return true
   }
 
-  #setFlotToSea () {
+  #setFlotToSea() {
+    const ships = Object.keys(this.flot).sort((a, b) => a > b ? -1 : 1)
+    for (let i = 0; i < ships.length; i++) {
+      let flag = false
+      let n = 0
+      do {
+        const num = this.#getRandomIndex(this.#tempArr.length)
+        flag = this.#canToPlace(num, ships[i])
+        n++
+      } while (!flag && n < 5000)
+    }
 
-    const ship = '41'
-    const num = this.#getRandomIndex(this.#tempArr.length)
-    const canToPlace = this.#canToPlace(num, ship)
-
-    console.log(canToPlace)
     console.log(this.flot)
+    // console.log(this.sea)
   }
 
 
