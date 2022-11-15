@@ -1,29 +1,59 @@
-import React, {FC} from 'react'
+import React, {FC, MouseEvent, useEffect, useState} from 'react'
 import {getArr10x10} from "../../utils/getArr10x10"
 import st from './Field.module.scss'
-import {MyCell} from "./MyCell";
-import {IGame, MyFlotClass} from "../../classes/MyFlotClass";
+import {Cell} from "./Cell";
+import {IGame} from "../../classes/MyFlotClass";
 
 interface IFieldProps {
-  own: string
-  hover: (id: string) => void
-  leave: () => void
+  own: 'my' | 'en'
   game?: IGame
 }
 
-export const Field: FC<IFieldProps> = ({own, hover, leave, game}) => {
-  if (game) console.log(game)
+export const Field: FC<IFieldProps> = ({own, game}) => {
+  const [currentCell, setCurrentCell] = useState('')
+  const [selectShip, setSelectedShip] = useState<string>('')
+  const [selectShipArr, setSelectedShipArr] = useState<number[]>([])
+
+  const leave = () => {
+    setCurrentCell('')
+  }
+  const hover = (id: string) => {
+    setCurrentCell(id)
+  }
+
+  const downHandler = (e: MouseEvent<HTMLTableElement>) => {
+    if (game && own === 'my') {
+      const coordinates = Number((e.target as Element).id.slice(2))
+      const ship = game.sea[coordinates].ship
+      if (ship) {
+        setSelectedShip(ship)
+        game.sea.forEach((cell, i) =>
+          cell.ship === ship && setSelectedShipArr(state => [...state, i]))
+      }
+    }
+  }
+
+  const upHandler = (e: MouseEvent<HTMLTableElement>) => {
+    if (game && own === 'my') {
+      setSelectedShip('')
+      setSelectedShipArr([])
+    }
+  }
+
   return (
     <table
+      onMouseDown={(e) => downHandler(e)}
+      onMouseUp={(e) => upHandler(e)}
       onMouseLeave={leave}
       className={st.table}>
       <tbody>
       {getArr10x10().map((line, row) =>
         <tr key={`${own}${row}`}>
           {line.map((cell: string, i: number) =>
-            <MyCell
-              ship = {game?.sea[row * 10 + i].ship}
-              attack = {game?.sea[row * 10 + i].attack}
+            <Cell
+              selectedShip={selectShip}
+              ship={game?.sea[row * 10 + i].ship}
+              attack={game?.sea[row * 10 + i].attack}
               hover={hover}
               id={`${own}${cell}`}
               key={`${own}${cell}`}/>)}

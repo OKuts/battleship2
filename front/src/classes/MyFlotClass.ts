@@ -10,7 +10,7 @@ interface IShip {
 }
 
 export interface IFlot {
-   [key: string]: IShip
+  [key: string]: IShip
 }
 
 export interface IGame {
@@ -18,19 +18,17 @@ export interface IGame {
   flot: IFlot
 }
 
-
 export class MyFlotClass {
   sea: ICell[]
   flot: IFlot
-  #tempArr: number[]
+  tempArr: number[]
 
   constructor() {
     this.sea = new Array(100).fill({ship: null, attack: false})
-    this.#tempArr = [...new Array(100).fill(0).keys()]
+    this.tempArr = [...new Array(100).fill(0).keys()]
     this.flot = {}
     this.#initFlot()
     this.#setFlotToSea()
-
   }
 
   getGame(): IGame {
@@ -51,43 +49,51 @@ export class MyFlotClass {
     })
   }
 
-  #getShipCoordinates(num: number, direction: boolean, ship: number): number[] {
-    const startY = num > 9 ? Number(`${num}`[0]) : 0
-    const startX = num - startY * 10
-    const endY = direction ? startY : startY + ship - 1
-    const endX = direction ? startX + ship - 1 : startX
-    return [startY, startX, endY, endX]
+  #getLeftRightPoint(point: number, k: (1 | -1 | 0)): [number, number] {
+    const [y, x] = point < 10 ? `0${point}` : `${point}`
+    const [numY, numX] = [Number(y), Number(x)]
+    const outY = (numY + 1 * k) < 0 || (numY + 1 * k) > 9 ? numY : numY + 1 * k
+    const outX = (numX + 1 * k) < 0 || (numX + 1 * k) > 9 ? numX : numX + 1 * k
+    return [outY, outX]
   }
 
-  #getAroundShip(startY: number, startX: number, endY: number, endX: number): number[] {
-    const maxY = endY === 9 ? 9 : endY + 1
-    const maxX = endX === 9 ? 9 : endX + 1
-    const minX = startX === 0 ? 0 : startX - 1
-    const minY = startY === 0 ? 0 : startY - 1
-    return [minY, minX, maxY, maxX]
+  #getCoordinatesArray(minY: number, minX: number, maxY: number, maxX: number): number[] {
+    const out = []
+    for (let i = minY; i <= maxY; i++) {
+      for (let j = minX; j <= maxX; j++) {
+        out.push(i * 10 + j)
+      }
+    }
+    return out
+  }
+
+  #getOneShipArr(num: number, direction: boolean, ship: number): number[] {
+    const [minY, minX] = this.#getLeftRightPoint(num, 0)
+    const maxY = direction ? minY : minY + ship - 1
+    const maxX = direction ? minX + ship - 1 : minX
+    if (maxX > 9 || maxY > 9) return []
+    return this.#getCoordinatesArray(minY, minX, maxY, maxX)
+  }
+
+  #getAroundOneShipArr(oneShipArr: number[]): number[] {
+    const [minY, minX] = this.#getLeftRightPoint(oneShipArr[0], -1)
+    const [maxY, maxX] = this.#getLeftRightPoint(oneShipArr[oneShipArr.length - 1], 1)
+    return this.#getCoordinatesArray(minY, minX, maxY, maxX)
   }
 
   #canToPlace(num: number, ship: string) {
     const direction = !!this.#getRandomIndex(2)
-    if (!this.#tempArr[num]) return false
-    const [startY, startX, endY, endX] = this.#getShipCoordinates(num, direction, +ship[0])
-    if (endX > 9 || endY > 9) return false
-    const [minY, minX, maxY, maxX] = this.#getAroundShip(startY, startX, endY, endX)
-    const tempSea = [...this.sea]
-    const tempFilter: number[] = []
+    if (!this.tempArr[num]) return false
 
-    for (let i = minY; i <= maxY; i++) {
-      for (let j = minX; j <= maxX; j++) {
-        if (tempSea[i * 10 + j].ship) return false
-        if (endY >= i && i >= startY && endX >= j && j >= startX) {
-          tempSea[i * 10 + j] = {ship, attack: false}
-          tempFilter.push(i * 10 + j)
-        }
-      }
-    }
+    const oneShipArr: number[] = this.#getOneShipArr(num, direction, +ship[0])
+    if (!oneShipArr[0]) return false
 
-    this.sea = [...tempSea]
-    this.#tempArr = this.#tempArr.filter(el => !tempFilter.includes(el))
+    const aroundOneShipArr: number[] = this.#getAroundOneShipArr(oneShipArr)
+    const controlLength = [...new Set([...aroundOneShipArr, ...this.tempArr])].length
+
+    if ( controlLength !==  this.tempArr.length) return false
+    oneShipArr.forEach(yx => this.sea[yx] = {ship, attack: false})
+    this.tempArr = this.tempArr.filter(el => !oneShipArr.includes(el))
     this.flot[ship].yx = num < 10 ? `0${num}` : `${num}`
     this.flot[ship].direction = direction
 
@@ -98,17 +104,11 @@ export class MyFlotClass {
     const ships = Object.keys(this.flot).sort((a, b) => a > b ? -1 : 1)
     for (let i = 0; i < ships.length; i++) {
       let flag = false
-      let n = 0
       do {
-        const num = this.#getRandomIndex(this.#tempArr.length)
+        const num = this.#getRandomIndex(this.tempArr.length)
         flag = this.#canToPlace(num, ships[i])
-        n++
       } while (!flag)
     }
-    this.#tempArr = []
-    // console.log(this.flot)
-    // console.log(this.sea)
+    this.tempArr = []
   }
-
-
 }

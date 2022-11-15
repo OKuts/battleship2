@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react'
+import React, {FC, useEffect, useState} from 'react'
 
 import st from './Field.module.scss'
 
@@ -7,9 +7,17 @@ interface ICellProps {
   hover: (id: string) => void
   ship?: string | null
   attack?: boolean
+  selectedShip: string
 }
 
-export const MyCell: FC<ICellProps> = ({id, hover, ship, attack}) => {
+export const Cell: FC<ICellProps> = (
+  {
+    id,
+    hover,
+    ship,
+    attack,
+    selectedShip,
+  }) => {
   const [cn, setCn] = useState('')
   const [, , y, x] = id
 
@@ -19,8 +27,10 @@ export const MyCell: FC<ICellProps> = ({id, hover, ship, attack}) => {
   }
 
   const leaveHandler = () => {
-    setCn('')
+    if (selectedShip !== ship) setCn('')
   }
+
+  useEffect(() => { setCn( selectedShip === ship ? 'hover' : '')}, [selectedShip])
 
   return (
     <td
