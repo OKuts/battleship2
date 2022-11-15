@@ -1,24 +1,22 @@
 import React, {FC, useEffect, useState} from 'react'
 import {Field} from "./components/Fields/Field";
 import {Control} from "./components/Control/Control";
-import {MyFlotClass} from "./classes/MyFlotClass";
+import {useAppDispatch, useAppSelector} from "./hooks/useAppDispatch";
 
 export const Game: FC = () => {
-  const [currentCell, setCurrentCell] = useState('')
-  const [game, setGame] = useState(new MyFlotClass().getGame())
+  const dispatch = useAppDispatch()
+  const {game} = useAppSelector(state => state.game)
 
-  const leave = () => {
-    setCurrentCell('')
-  }
-  const hover = (id: string) => {
-    setCurrentCell(id)
-  }
+  useEffect(()=>{
+    // dispatch(printGame())
+    console.log(game)
+  },[])
 
   return (
     <div className={'wrap'}>
-      <Field game={game} hover={hover} leave={leave} own={'my'}/>
+      <Field game={game} own={'my'}/>
       <Control/>
-      <Field hover={hover} leave={leave} own={'en'}/>
+      <Field own={'en'}/>
     </div>
   )
 }
