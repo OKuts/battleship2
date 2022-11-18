@@ -4,40 +4,41 @@ import st from './Field.module.scss'
 
 interface ICellProps {
   id: string
-  hover: (id: string) => void
-  ship?: string | null
+  ship?: string
   attack?: boolean
   selectedShip: string
+  plan?: string
 }
 
 export const Cell: FC<ICellProps> = (
   {
     id,
-    hover,
     ship,
     attack,
     selectedShip,
+    plan
   }) => {
   const [cn, setCn] = useState('')
   const [, , y, x] = id
 
   const overHandler = () => {
-    hover(id)
     setCn('hover')
   }
 
   const leaveHandler = () => {
-    if (selectedShip !== ship) setCn('')
+    setCn('')
   }
 
-  useEffect(() => { setCn( selectedShip === ship ? 'hover' : '')}, [selectedShip])
+  useEffect(() => {
+    setCn( selectedShip === ship && ship ? 'hover' : '')
+  }, [selectedShip])
 
   return (
     <td
       className={st[cn]}
       onMouseLeave={leaveHandler}
       onMouseOver={overHandler}
-      style={{background: ship ? attack ? 'red' : 'deepskyblue' : ''}}
+      style={{background: ship ? 'deepskyblue' : plan ? 'red' : ''}}
       id={id}>
       {y === '0' && <div className={st.coordinateX}>{String.fromCharCode(+x + 65)}</div>}
       {x === '0' && <div className={st.coordinateY}>{y}</div>}

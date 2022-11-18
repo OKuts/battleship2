@@ -1,6 +1,8 @@
-interface ICell {
-  ship: string | null
+export interface ICell {
+  ship: string
+  around: string[]
   attack: boolean
+  plan: string
 }
 
 interface IShip {
@@ -24,11 +26,29 @@ export class MyFlotClass {
   tempArr: number[]
 
   constructor() {
-    this.sea = new Array(100).fill({ship: null, attack: false})
+    this.sea = new Array(100).fill({ship: '', around: [], attack: false, plan: ''})
     this.tempArr = [...new Array(100).fill(0).keys()]
     this.flot = {}
     this.#initFlot()
     this.#setFlotToSea()
+    this.#setShipsAroundPoint()
+  }
+
+  #setShipsAroundPoint() {
+    this.sea.forEach((cell, i) => {
+      const [minY, minX] = this.#getLeftRightPoint(i, -1)
+      const [maxY, maxX] = this.#getLeftRightPoint(i, 1)
+      let tempArr: string[] = []
+      for (let j = minY; j <= maxY; j++) {
+        for (let k = minX; k <= maxX; k++) {
+          if (!cell.ship) {
+            const ship: string = this.sea[j * 10 + k].ship
+            if (!tempArr.includes(ship) && !!ship) tempArr.push(this.sea[j * 10 + k].ship)
+          }
+        }
+      }
+      this.sea[i] = {...cell, around: [...tempArr]}
+    })
   }
 
   getGame(): IGame {
@@ -81,8 +101,7 @@ export class MyFlotClass {
     return this.#getCoordinatesArray(minY, minX, maxY, maxX)
   }
 
-  #canToPlace(num: number, ship: string) {
-    const direction = !!this.#getRandomIndex(2)
+  #canToPlace(num: number, ship: string, direction: boolean) {
     if (!this.tempArr[num]) return false
 
     const oneShipArr: number[] = this.#getOneShipArr(num, direction, +ship[0])
@@ -91,8 +110,10 @@ export class MyFlotClass {
     const aroundOneShipArr: number[] = this.#getAroundOneShipArr(oneShipArr)
     const controlLength = [...new Set([...aroundOneShipArr, ...this.tempArr])].length
 
-    if ( controlLength !==  this.tempArr.length) return false
-    oneShipArr.forEach(yx => this.sea[yx] = {ship, attack: false})
+    if (controlLength !== this.tempArr.length) return false
+    oneShipArr.forEach(yx => {
+      this.sea[yx] = {ship, around: [], attack: false, plan: ''}
+    })
     this.tempArr = this.tempArr.filter(el => !oneShipArr.includes(el))
     this.flot[ship].yx = num < 10 ? `0${num}` : `${num}`
     this.flot[ship].direction = direction
@@ -106,7 +127,8 @@ export class MyFlotClass {
       let flag = false
       do {
         const num = this.#getRandomIndex(this.tempArr.length)
-        flag = this.#canToPlace(num, ships[i])
+        const direction = !!this.#getRandomIndex(2)
+        flag = this.#canToPlace(num, ships[i], direction)
       } while (!flag)
     }
     this.tempArr = []

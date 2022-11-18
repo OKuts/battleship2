@@ -8,7 +8,6 @@ export const Game: FC = () => {
   const {game} = useAppSelector(state => state.game)
 
   useEffect(()=>{
-    // dispatch(printGame())
     console.log(game)
   },[])
 
