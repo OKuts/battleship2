@@ -45,12 +45,16 @@ export const gameSlice = createSlice({
       } else {
         state.currentShip.begin = state.currentShip.tempArr.indexOf(action.payload)
       }
-    }
+    },
+
+    turnShip(state) {
+      console.log('yes')
+    },
   },
 })
 
 export const {
-  reset, rememberShip, forgetShip, moveShip
+  reset, rememberShip, forgetShip, moveShip, turnShip
 } = gameSlice.actions
 
 export default gameSlice.reducer

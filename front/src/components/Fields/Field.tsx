@@ -1,10 +1,10 @@
-import React, {FC, MouseEvent, useEffect} from 'react'
+import React, {FC, MouseEvent} from 'react'
 import {getArr10x10} from "../../utils/getArr10x10"
 import st from './Field.module.scss'
 import {Cell} from "./Cell";
 import {IGame} from "../../classes/MyFlotClass";
 import {useAppDispatch, useAppSelector} from "../../hooks/useAppDispatch";
-import {forgetShip, moveShip, rememberShip} from "../../store/gameSlice";
+import {forgetShip, moveShip, rememberShip, turnShip} from "../../store/gameSlice";
 
 interface IFieldProps {
   own: 'my' | 'en'
@@ -30,8 +30,8 @@ export const Field: FC<IFieldProps> = ({own, game}) => {
     }
   }
 
-  const upHandler = () => {
-    if (game && own === 'my') {
+  const upHandler = (e: MouseEvent<HTMLTableElement>) => {
+    if (game && own === 'my' && !e.button) {
       dispatch(forgetShip(true))
     }
   }
@@ -44,15 +44,17 @@ export const Field: FC<IFieldProps> = ({own, game}) => {
     }
   }
 
-  // useEffect(() => {
-  //   console.log(selectedShip)
-  // }, [selectedShip])
+  const contextHandler = (e: MouseEvent<HTMLTableElement>) => {
+    e.preventDefault()
+    dispatch(turnShip())
+  }
 
   return (
     <table
-      onMouseDown={(e) => downHandler(e)}
-      onMouseOver={(e) => overCellHandler(e)}
-      onMouseUp={upHandler}
+      onContextMenu={contextHandler}
+      onMouseDown={downHandler}
+      onMouseOver={overCellHandler}
+      onMouseUp={upHandler }
       onMouseLeave={leaveHandler}
       className={st.table}>
       <tbody>
