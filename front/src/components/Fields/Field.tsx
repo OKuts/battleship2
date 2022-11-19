@@ -1,4 +1,4 @@
-import React, {FC, MouseEvent, useEffect, useState} from 'react'
+import React, {FC, MouseEvent, useEffect} from 'react'
 import {getArr10x10} from "../../utils/getArr10x10"
 import st from './Field.module.scss'
 import {Cell} from "./Cell";
@@ -12,42 +12,35 @@ interface IFieldProps {
 }
 
 export const Field: FC<IFieldProps> = ({own, game}) => {
-  const selectedShip = useAppSelector(({game}) => game.currentShip.name)
-  const [mouseCell, setMouseCell] = useState(-1)
+  const {name, tempArr} = useAppSelector(({game}) => game.currentShip)
 
   const dispatch = useAppDispatch()
 
   const leaveHandler = () => {
-    dispatch(forgetShip())
-    setMouseCell(-1)
+    dispatch(forgetShip(false))
   }
 
-  const downHandler = () => {
+  const downHandler = (e: MouseEvent<HTMLTableElement>) => {
+    const begin = Number((e.target as Element).id.slice(2))
     if (game && own === 'my') {
-      const ship = game.sea[mouseCell].ship
+      const ship = game.sea[begin].ship
       if (ship) {
-        dispatch(rememberShip(ship))
+        dispatch(rememberShip({ship, begin}))
       }
     }
   }
 
   const upHandler = () => {
     if (game && own === 'my') {
-      dispatch(forgetShip())
+      dispatch(forgetShip(true))
     }
   }
 
   const overCellHandler = (e: MouseEvent<HTMLTableElement>) => {
-    const id = (e.target as Element).id
-    if (game && own === 'my' && id) {
-      const coordinates = Number(id.slice(2))
-      if (selectedShip && coordinates !== mouseCell) {
-        const d = coordinates - mouseCell
-        const dy = d > 0 ? Math.floor(d / 10) : - Math.floor(-d / 10)
-        const dx = d % 10
-        dispatch(moveShip({dy, dx}))
+    if (game && own === 'my') {
+      if (name) {
+        dispatch(moveShip(Number((e.target as Element).id.slice(2))))
       }
-      setMouseCell(coordinates)
     }
   }
 
@@ -57,7 +50,7 @@ export const Field: FC<IFieldProps> = ({own, game}) => {
 
   return (
     <table
-      onMouseDown={downHandler}
+      onMouseDown={(e) => downHandler(e)}
       onMouseOver={(e) => overCellHandler(e)}
       onMouseUp={upHandler}
       onMouseLeave={leaveHandler}
@@ -67,9 +60,9 @@ export const Field: FC<IFieldProps> = ({own, game}) => {
         <tr key={`${own}${row}`}>
           {line.map((cell: string, i: number) =>
             <Cell
-              selectedShip={selectedShip}
+              selectedShip={name}
               ship={game?.sea[row * 10 + i].ship}
-              plan={game?.sea[row * 10 + i].plan}
+              isMark={tempArr.includes(row * 10 + i) && !!game}
               attack={game?.sea[row * 10 + i].attack}
               id={`${own}${cell}`}
               key={`${own}${cell}`}/>)}

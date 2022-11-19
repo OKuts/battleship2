@@ -2,7 +2,6 @@ export interface ICell {
   ship: string
   around: string[]
   attack: boolean
-  plan: string
 }
 
 interface IShip {
@@ -26,7 +25,7 @@ export class MyFlotClass {
   tempArr: number[]
 
   constructor() {
-    this.sea = new Array(100).fill({ship: '', around: [], attack: false, plan: ''})
+    this.sea = new Array(100).fill({ship: '', around: [], attack: false})
     this.tempArr = [...new Array(100).fill(0).keys()]
     this.flot = {}
     this.#initFlot()
@@ -112,7 +111,7 @@ export class MyFlotClass {
 
     if (controlLength !== this.tempArr.length) return false
     oneShipArr.forEach(yx => {
-      this.sea[yx] = {ship, around: [], attack: false, plan: ''}
+      this.sea[yx] = {ship, around: [], attack: false}
     })
     this.tempArr = this.tempArr.filter(el => !oneShipArr.includes(el))
     this.flot[ship].yx = num < 10 ? `0${num}` : `${num}`

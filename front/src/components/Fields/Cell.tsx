@@ -7,7 +7,7 @@ interface ICellProps {
   ship?: string
   attack?: boolean
   selectedShip: string
-  plan?: string
+  isMark?: boolean
 }
 
 export const Cell: FC<ICellProps> = (
@@ -16,7 +16,7 @@ export const Cell: FC<ICellProps> = (
     ship,
     attack,
     selectedShip,
-    plan
+    isMark
   }) => {
   const [cn, setCn] = useState('')
   const [, , y, x] = id
@@ -38,7 +38,7 @@ export const Cell: FC<ICellProps> = (
       className={st[cn]}
       onMouseLeave={leaveHandler}
       onMouseOver={overHandler}
-      style={{background: ship ? 'deepskyblue' : plan ? 'red' : ''}}
+      style={{background: isMark ? 'red' : ship ? 'deepskyblue' : ''}}
       id={id}>
       {y === '0' && <div className={st.coordinateX}>{String.fromCharCode(+x + 65)}</div>}
       {x === '0' && <div className={st.coordinateY}>{y}</div>}
