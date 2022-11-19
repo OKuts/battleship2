@@ -1,4 +1,4 @@
-import {IGame, MyFlotClass} from "../classes/MyFlotClass";
+import {ICell, MyFlotClass} from "../classes/MyFlotClass";
 
 export interface ICurrentShip {
   name: string,
@@ -9,13 +9,13 @@ export interface ICurrentShip {
 
 
 interface IInitialState {
-  game: IGame,
+  sea: ICell[],
   currentShip: ICurrentShip
 }
 
 
 export const initialState: IInitialState = {
-  game: new MyFlotClass().getGame(),
+  sea: new MyFlotClass().getSea(),
   currentShip: {
     name: '',
     arr: [],

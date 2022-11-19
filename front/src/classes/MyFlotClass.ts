@@ -10,24 +10,15 @@ interface IShip {
   attack: number
 }
 
-export interface IFlot {
-  [key: string]: IShip
-}
-
-export interface IGame {
-  sea: ICell[],
-  flot: IFlot
-}
-
 export class MyFlotClass {
   sea: ICell[]
-  flot: IFlot
+  flot: string[]
   tempArr: number[]
 
   constructor() {
     this.sea = new Array(100).fill({ship: '', around: [], attack: false})
     this.tempArr = [...new Array(100).fill(0).keys()]
-    this.flot = {}
+    this.flot = []
     this.#initFlot()
     this.#setFlotToSea()
     this.#setShipsAroundPoint()
@@ -50,8 +41,8 @@ export class MyFlotClass {
     })
   }
 
-  getGame(): IGame {
-    return {sea: this.sea, flot: this.flot}
+  getSea(): ICell[] {
+    return this.sea
   }
 
   #getRandomIndex(max: number) {
@@ -63,7 +54,7 @@ export class MyFlotClass {
       const pal = 4 - i
       new Array(5 - pal).fill(0).forEach((_: number, j) => {
         const key = `${pal}${j + 1}`
-        this.flot[key] = {yx: '', direction: false, attack: 0}
+        this.flot.push(key)
       })
     })
   }
@@ -114,20 +105,17 @@ export class MyFlotClass {
       this.sea[yx] = {ship, around: [], attack: false}
     })
     this.tempArr = this.tempArr.filter(el => !oneShipArr.includes(el))
-    this.flot[ship].yx = num < 10 ? `0${num}` : `${num}`
-    this.flot[ship].direction = direction
 
     return true
   }
 
   #setFlotToSea() {
-    const ships = Object.keys(this.flot).sort((a, b) => a > b ? -1 : 1)
-    for (let i = 0; i < ships.length; i++) {
+    for (let i = 0; i < 10; i++) {
       let flag = false
       do {
         const num = this.#getRandomIndex(this.tempArr.length)
         const direction = !!this.#getRandomIndex(2)
-        flag = this.#canToPlace(num, ships[i], direction)
+        flag = this.#canToPlace(num, this.flot[i], direction)
       } while (!flag)
     }
     this.tempArr = []

@@ -2,16 +2,16 @@ import React, {FC, MouseEvent} from 'react'
 import {getArr10x10} from "../../utils/getArr10x10"
 import st from './Field.module.scss'
 import {Cell} from "./Cell";
-import {IGame} from "../../classes/MyFlotClass";
 import {useAppDispatch, useAppSelector} from "../../hooks/useAppDispatch";
 import {forgetShip, moveShip, rememberShip, turnShip} from "../../store/gameSlice";
+import {ICell} from "../../classes/MyFlotClass";
 
 interface IFieldProps {
   own: 'my' | 'en'
-  game?: IGame
+  sea?: ICell[]
 }
 
-export const Field: FC<IFieldProps> = ({own, game}) => {
+export const Field: FC<IFieldProps> = ({own, sea}) => {
   const {name, tempArr} = useAppSelector(({game}) => game.currentShip)
 
   const dispatch = useAppDispatch()
@@ -22,8 +22,8 @@ export const Field: FC<IFieldProps> = ({own, game}) => {
 
   const downHandler = (e: MouseEvent<HTMLTableElement>) => {
     const begin = Number((e.target as Element).id.slice(2))
-    if (game && own === 'my') {
-      const ship = game.sea[begin].ship
+    if (sea && own === 'my') {
+      const ship = sea[begin].ship
       if (ship) {
         dispatch(rememberShip({ship, begin}))
       }
@@ -31,13 +31,13 @@ export const Field: FC<IFieldProps> = ({own, game}) => {
   }
 
   const upHandler = (e: MouseEvent<HTMLTableElement>) => {
-    if (game && own === 'my' && !e.button) {
+    if (sea && own === 'my' && !e.button) {
       dispatch(forgetShip(true))
     }
   }
 
   const overCellHandler = (e: MouseEvent<HTMLTableElement>) => {
-    if (game && own === 'my') {
+    if (sea && own === 'my') {
       if (name) {
         dispatch(moveShip(Number((e.target as Element).id.slice(2))))
       }
@@ -63,9 +63,9 @@ export const Field: FC<IFieldProps> = ({own, game}) => {
           {line.map((cell: string, i: number) =>
             <Cell
               selectedShip={name}
-              ship={game?.sea[row * 10 + i].ship}
-              isMark={tempArr.includes(row * 10 + i) && !!game}
-              attack={game?.sea[row * 10 + i].attack}
+              ship={sea ? sea[row * 10 + i].ship : ''}
+              isMark={tempArr.includes(row * 10 + i) && !!sea}
+              attack={sea ? sea[row * 10 + i].attack : false}
               id={`${own}${cell}`}
               key={`${own}${cell}`}/>)}
         </tr>
