@@ -1,44 +1,18 @@
 export interface ICell {
   ship: string
-  around: string[]
   attack: boolean
 }
-
-interface IShip {
-  direction: boolean,
-  yx: string,
-  attack: number
-}
-
 export class MyFlotClass {
   sea: ICell[]
   flot: string[]
   tempArr: number[]
 
   constructor() {
-    this.sea = new Array(100).fill({ship: '', around: [], attack: false})
+    this.sea = new Array(100).fill({ship: '', attack: false})
     this.tempArr = [...new Array(100).fill(0).keys()]
     this.flot = []
     this.#initFlot()
     this.#setFlotToSea()
-    this.#setShipsAroundPoint()
-  }
-
-  #setShipsAroundPoint() {
-    this.sea.forEach((cell, i) => {
-      const [minY, minX] = this.#getLeftRightPoint(i, -1)
-      const [maxY, maxX] = this.#getLeftRightPoint(i, 1)
-      let tempArr: string[] = []
-      for (let j = minY; j <= maxY; j++) {
-        for (let k = minX; k <= maxX; k++) {
-          if (!cell.ship) {
-            const ship: string = this.sea[j * 10 + k].ship
-            if (!tempArr.includes(ship) && !!ship) tempArr.push(this.sea[j * 10 + k].ship)
-          }
-        }
-      }
-      this.sea[i] = {...cell, around: [...tempArr]}
-    })
   }
 
   getSea(): ICell[] {
@@ -102,7 +76,7 @@ export class MyFlotClass {
 
     if (controlLength !== this.tempArr.length) return false
     oneShipArr.forEach(yx => {
-      this.sea[yx] = {ship, around: [], attack: false}
+      this.sea[yx] = {ship, attack: false}
     })
     this.tempArr = this.tempArr.filter(el => !oneShipArr.includes(el))
 

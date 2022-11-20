@@ -3,6 +3,7 @@ import {ICell, MyFlotClass} from "../classes/MyFlotClass";
 import {isVerticalShip} from "../utils/isVerticalShip";
 import {editedArr} from "../utils/editedArr";
 import {IInitialState} from "./storeTypes";
+import {canToPlace} from "../utils/canToPlace";
 
 export const initialState: IInitialState = {
   sea: new MyFlotClass().getSea(),
@@ -39,7 +40,9 @@ export const gameSlice = createSlice({
     },
 
     forgetShip(state, action) {
-      const arr = action.payload ? state.currentShip.tempArr : state.currentShip.arr
+      const isCanToPlace = canToPlace(state.currentShip.tempArr, state.sea)
+      const arr = action.payload && isCanToPlace ? state.currentShip.tempArr : state.currentShip.arr
+
       arr.forEach(cell => {
         state.sea[cell].ship = state.currentShip.name
       })
