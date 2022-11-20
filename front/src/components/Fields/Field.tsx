@@ -46,7 +46,8 @@ export const Field: FC<IFieldProps> = ({own, sea}) => {
 
   const contextHandler = (e: MouseEvent<HTMLTableElement>) => {
     e.preventDefault()
-    dispatch(turnShip())
+
+    dispatch(turnShip(Number((e.target as Element).id.slice(2))))
   }
 
   return (
