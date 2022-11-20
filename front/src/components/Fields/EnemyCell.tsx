@@ -1,25 +1,16 @@
-import React, {FC, useEffect, useState} from 'react'
+import React, {FC, useState} from 'react'
 
 import st from './Field.module.scss'
 
 interface ICellProps {
   id: string
-  ship?: string
-  attack?: boolean
-  selectedShip: string
-  isMark?: boolean
+  attack: boolean | null
+  nextStep: (id: string) => void
 }
 
-export const Cell: FC<ICellProps> = (
-  {
-    id,
-    ship,
-    attack,
-    selectedShip,
-    isMark
-  }) => {
+export const EnemyCell: FC<ICellProps> = ({id, attack, nextStep}) => {
   const [cn, setCn] = useState('')
-  const [, , y, x] = id
+  const [y, x] = id
 
   const overHandler = () => {
     setCn('hover')
@@ -29,20 +20,17 @@ export const Cell: FC<ICellProps> = (
     setCn('')
   }
 
-  useEffect(() => {
-    setCn( selectedShip === ship && ship ? 'hover' : '')
-  }, [selectedShip])
-
   return (
     <td
       className={st[cn]}
       onMouseLeave={leaveHandler}
       onMouseOver={overHandler}
-      style={{background: isMark ? 'red' : ship ? 'deepskyblue' : ''}}
+      onClick={() => nextStep(id)}
+      style={{background: attack ? 'red': '' }}
       id={id}>
       {y === '0' && <div className={st.coordinateX}>{String.fromCharCode(+x + 65)}</div>}
       {x === '0' && <div className={st.coordinateY}>{y}</div>}
-      {attack && <>&bull;</>}
+      {attack === false && <>&bull;</>}
     </td>
   )
 }

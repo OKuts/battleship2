@@ -11,4 +11,5 @@ interface ICurrentShip {
 export interface IInitialState {
   sea: ICell[],
   currentShip: ICurrentShip
+  enSea: boolean[] | null[]
 }

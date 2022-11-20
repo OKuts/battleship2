@@ -1,18 +1,12 @@
 import React, {FC, MouseEvent} from 'react'
 import {getArr10x10} from "../../utils/getArr10x10"
 import st from './Field.module.scss'
-import {Cell} from "./Cell";
 import {useAppDispatch, useAppSelector} from "../../hooks/useAppDispatch";
 import {forgetShip, moveShip, rememberShip, turnShip} from "../../store/gameSlice";
-import {ICell} from "../../classes/MyFlotClass";
+import {MyCell} from "./MyCell";
 
-interface IFieldProps {
-  own: 'my' | 'en'
-  sea?: ICell[]
-}
-
-export const Field: FC<IFieldProps> = ({own, sea}) => {
-  const {name, tempArr} = useAppSelector(({game}) => game.currentShip)
+export const MyField: FC = () => {
+  const {sea, currentShip: {name, tempArr}} = useAppSelector(({game}) => game)
 
   const dispatch = useAppDispatch()
 
@@ -21,33 +15,28 @@ export const Field: FC<IFieldProps> = ({own, sea}) => {
   }
 
   const downHandler = (e: MouseEvent<HTMLTableElement>) => {
-    const begin = Number((e.target as Element).id.slice(2))
-    if (sea && own === 'my') {
-      const ship = sea[begin].ship
-      if (ship) {
-        dispatch(rememberShip({ship, begin}))
-      }
+    const begin = Number((e.target as Element).id)
+    const ship = sea[begin].ship
+    if (ship) {
+      dispatch(rememberShip({ship, begin}))
     }
   }
 
   const upHandler = (e: MouseEvent<HTMLTableElement>) => {
-    if (sea && own === 'my' && !e.button) {
+    if (!e.button) {
       dispatch(forgetShip(true))
     }
   }
 
   const overCellHandler = (e: MouseEvent<HTMLTableElement>) => {
-    if (sea && own === 'my') {
-      if (name) {
-        dispatch(moveShip(Number((e.target as Element).id.slice(2))))
-      }
+    if (name) {
+      dispatch(moveShip(Number((e.target as Element).id)))
     }
   }
 
   const contextHandler = (e: MouseEvent<HTMLTableElement>) => {
     e.preventDefault()
-
-    dispatch(turnShip(Number((e.target as Element).id.slice(2))))
+    dispatch(turnShip(Number((e.target as Element).id)))
   }
 
   return (
@@ -55,20 +44,20 @@ export const Field: FC<IFieldProps> = ({own, sea}) => {
       onContextMenu={contextHandler}
       onMouseDown={downHandler}
       onMouseOver={overCellHandler}
-      onMouseUp={upHandler }
+      onMouseUp={upHandler}
       onMouseLeave={leaveHandler}
       className={st.table}>
       <tbody>
       {getArr10x10().map((line, row) =>
-        <tr key={`${own}${row}`}>
+        <tr key={`my${row}`}>
           {line.map((cell: string, i: number) =>
-            <Cell
+            <MyCell
               selectedShip={name}
               ship={sea ? sea[row * 10 + i].ship : ''}
               isMark={tempArr.includes(row * 10 + i) && !!sea}
               attack={sea ? sea[row * 10 + i].attack : false}
-              id={`${own}${cell}`}
-              key={`${own}${cell}`}/>)}
+              id={`${row}${i}`}
+              key={`my${cell}`}/>)}
         </tr>
       )}
       </tbody>

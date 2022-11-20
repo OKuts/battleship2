@@ -11,7 +11,8 @@ export const initialState: IInitialState = {
     arr: [],
     begin: 0,
     tempArr: []
-  }
+  },
+  enSea: new Array(100).fill(null)
 }
 
 export const gameSlice = createSlice({
@@ -21,6 +22,7 @@ export const gameSlice = createSlice({
   reducers: {
     reset(state) {
       state.sea = new MyFlotClass().getSea()
+      state.enSea = new Array(100).fill(null)
     },
 
     rememberShip(state, action) {
@@ -69,11 +71,15 @@ export const gameSlice = createSlice({
         state.currentShip.begin = state.currentShip.tempArr.indexOf(action.payload)
       }
     },
+
+    doStep (state, action) {
+      state.enSea[action.payload] = false
+    }
   },
 })
 
 export const {
-  reset, rememberShip, forgetShip, moveShip, turnShip
+  reset, rememberShip, forgetShip, moveShip, turnShip, doStep
 } = gameSlice.actions
 
 export default gameSlice.reducer
