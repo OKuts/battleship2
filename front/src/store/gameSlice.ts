@@ -1,6 +1,8 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {ICell, MyFlotClass} from "../classes/MyFlotClass";
 import {initialState} from "./initialState";
+import {isVerticalShip} from "../utils/isVerticalShip";
+import {editedArr} from "../utils/editedArr";
 
 export const gameSlice = createSlice({
   name: 'sea',
@@ -49,11 +51,12 @@ export const gameSlice = createSlice({
 
     turnShip(state) {
       if (state.currentShip.tempArr[1]) {
-        const isVertical = state.currentShip.tempArr[1] - state.currentShip.tempArr[0] === 10
-        state.currentShip.tempArr = state.currentShip.tempArr.map((el, i) => {
+        const isVertical = isVerticalShip(state.currentShip.tempArr)
+        const tempArr = state.currentShip.tempArr.map((el, i) => {
           const shift = isVertical ? (state.currentShip.begin - i) : (i - state.currentShip.begin)
           return el + shift * 9
         })
+        state.currentShip.tempArr = editedArr(tempArr, state.currentShip.begin)
       }
     },
   },
