@@ -6,6 +6,15 @@ body {
 .wrap {
   display: flex;
   justify-content: center;
+  min-width: 400px;
 }
 
-
+@media screen and (max-width: 900px) {
+  .wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+  body {
+    padding-top: 30px;
+  }
+}

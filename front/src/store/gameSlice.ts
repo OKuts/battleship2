@@ -13,7 +13,7 @@ export const initialState: IInitialState = {
     begin: 0,
     tempArr: []
   },
-  enSea: new Array(100).fill(null)
+  enSea: new Array(100).fill(null),
 }
 
 export const gameSlice = createSlice({
@@ -74,15 +74,11 @@ export const gameSlice = createSlice({
         state.currentShip.begin = state.currentShip.tempArr.indexOf(action.payload)
       }
     },
-
-    doStep (state, action) {
-      state.enSea[action.payload] = false
-    }
   },
 })
 
 export const {
-  reset, rememberShip, forgetShip, moveShip, turnShip, doStep
+  reset, rememberShip, forgetShip, moveShip, turnShip
 } = gameSlice.actions
 
 export default gameSlice.reducer

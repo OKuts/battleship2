@@ -4,7 +4,7 @@ interface ICurrentShip {
   name: string,
   arr: number[],
   begin: number,
-  tempArr: number[]
+  tempArr: number[],
 }
 
 

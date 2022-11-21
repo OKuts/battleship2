@@ -1,17 +1,21 @@
-import React, {FC, MouseEvent} from 'react'
+import React, {FC, MouseEvent, useEffect} from 'react'
 import {getArr10x10} from "../../utils/getArr10x10"
 import {EnemyCell} from "./EnemyCell";
 import st from './Field.module.scss'
 import {useAppDispatch, useAppSelector} from "../../hooks/useAppDispatch";
-import {doStep} from "../../store/gameSlice";
+import {initConnection, sendStep} from "../../store/userSlice";
 
 export const EnemyField: FC = () => {
-  const {enSea} = useAppSelector(({game}) => game)
+  const {enSea} = useAppSelector(({user}) => user)
   const dispatch = useAppDispatch()
 
   const nextStep = (id: string): void => {
-    dispatch(doStep(Number(id)))
+    dispatch(sendStep(id))
   }
+
+  useEffect(()=> {
+    dispatch(initConnection())
+  }, [])
 
   return (
     <table className={st.table}>
