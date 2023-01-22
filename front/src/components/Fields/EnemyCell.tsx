@@ -30,7 +30,7 @@ export const EnemyCell: FC<ICellProps> = ({id, attack, nextStep}) => {
       id={id}>
       {y === '0' && <div className={st.coordinateX}>{String.fromCharCode(+x + 65)}</div>}
       {x === '0' && <div className={st.coordinateY}>{y}</div>}
-      {attack === false && <>&bull;</>}
+      {attack !== null && <>&bull;</>}
     </td>
   )
 }

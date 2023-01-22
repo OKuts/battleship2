@@ -38,7 +38,7 @@ export const MyCell: FC<ICellProps> = (
       className={st[cn]}
       onMouseLeave={leaveHandler}
       onMouseOver={overHandler}
-      style={{background: isMark ? 'red' : ship ? 'deepskyblue' : ''}}
+      style={{background: isMark || (ship && attack) ? 'red' : ship  ? 'deepskyblue' : ''}}
       id={id}>
       {y === '0' && <div className={st.coordinateX}>{String.fromCharCode(+x + 65)}</div>}
       {x === '0' && <div className={st.coordinateY}>{y}</div>}

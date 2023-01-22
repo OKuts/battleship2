@@ -72,6 +72,7 @@ export class MyFlotClass {
     if (!oneShipArr[0]) return false
 
     const aroundOneShipArr: number[] = this.#getAroundOneShipArr(oneShipArr)
+
     const controlLength = [...new Set([...aroundOneShipArr, ...this.tempArr])].length
 
     if (controlLength !== this.tempArr.length) return false

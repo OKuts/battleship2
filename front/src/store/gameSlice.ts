@@ -7,22 +7,54 @@ import {canToPlace} from "../utils/canToPlace";
 
 export const initialState: IInitialState = {
   sea: new MyFlotClass().getSea(),
+  enSea: new Array(100).fill(null),
+  enemyId: '',
+  myId: '',
+  canToStep: true,
   currentShip: {
     name: '',
     arr: [],
     begin: 0,
     tempArr: []
   },
-  enSea: new Array(100).fill(null),
+
 }
 
 export const gameSlice = createSlice({
-  name: 'sea',
+  name: 'game',
   initialState,
 
   reducers: {
-    reset(state) {
+
+    setGamers(state, action) {
+      state.enemyId = action.payload.enemyId
+      state.myId = action.payload.myId
+
+    },
+
+    changeCanToStep(state,action) {
+      state.canToStep = action.payload
+    },
+
+    markHit(state, action) {
+      state.enSea[Number(action.payload)] = true
+      state.canToStep = true
+    },
+
+    saveAttack(state, action) {
+      state.sea[Number(action.payload)].attack = true
+      state.canToStep = false
+    },
+
+    sendStep(state, action) {
+      state.enSea[Number(action.payload)] = false
+    },
+
+    resetMyField(state) {
       state.sea = new MyFlotClass().getSea()
+    },
+
+    resetEnemyField(state) {
       state.enSea = new Array(100).fill(null)
     },
 
@@ -78,7 +110,9 @@ export const gameSlice = createSlice({
 })
 
 export const {
-  reset, rememberShip, forgetShip, moveShip, turnShip
+  resetMyField, rememberShip, forgetShip, moveShip, turnShip,
+  resetEnemyField, sendStep, setGamers, saveAttack, changeCanToStep,
+  markHit
 } = gameSlice.actions
 
 export default gameSlice.reducer

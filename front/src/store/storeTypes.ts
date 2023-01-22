@@ -1,4 +1,5 @@
 import {ICell} from "../classes/MyFlotClass";
+import {Socket} from "socket.io-client";
 
 interface ICurrentShip {
   name: string,
@@ -9,7 +10,11 @@ interface ICurrentShip {
 
 
 export interface IInitialState {
+  // socket: Socket
   sea: ICell[],
   currentShip: ICurrentShip
-  enSea: boolean[] | null[]
+  enSea: Array <boolean | null>
+  enemyId: string
+  myId: string
+  canToStep: boolean
 }
